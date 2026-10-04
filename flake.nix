@@ -46,9 +46,9 @@
 
                               f = x: make (pages.${x} // { name = x; meta = m x; });
                               g = attrNames pages;
-
-                              c = writeText "${name}-context.json" (builtins.toJSON meta);
                             in map f g;
+
+                          c = writeText "${name}-context.json" (builtins.toJSON meta);
                         in stdenv.mkDerivation {
                           inherit name;
                           inherit src;
