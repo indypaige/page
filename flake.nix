@@ -46,15 +46,23 @@
 
                               f = x: make (pages.${x} // { name = x; meta = m x; });
                               g = attrNames pages;
+
+                              c = writeText "${name}-context.json" (builtins.toJSON meta);
                             in map f g;
                         in stdenv.mkDerivation {
                           inherit name;
                           inherit src;
 
+                          nativeBuildInputs = [
+                            gomplate
+                          ];
+
                           buildInputs  = inputs ++ pages';
                           buildPhase   = ''
                               runHook preBuild
-                              echo "${page meta}" > index.html
+
+                              gomplate -c .=${c} -f ${page} -o index.html
+
                               runHook postBuild
                           '';
 
@@ -62,8 +70,8 @@
                               runHook preInstall
                               mkdir -p $out/static
                               ${copy "$out/static" static}
-                              ${copy "$out"        (map toCp inputs)}
-                              ${copy "$out"        (map toCp pages')}
+                              ${copy "$out" (map toCp inputs)}
+                              ${copy "$out" (map toCp pages')}
                               cp index.html $out
                               runHook postInstall
                           '';
@@ -71,7 +79,7 @@
 
                meta = {
                  inherit name;
-                 last = meta;
+                 last = null;
                  path = "/";
                };
              in make {
