@@ -54,6 +54,7 @@
                           inherit src;
 
                           nativeBuildInputs = [
+                            tailwindcss
                             gomplate
                           ];
 
@@ -68,11 +69,28 @@
 
                           installPhase = ''
                               runHook preInstall
+
                               mkdir -p $out/static
                               ${copy "$out/static" static}
                               ${copy "$out" (map toCp inputs)}
                               ${copy "$out" (map toCp pages')}
                               cp index.html $out
+
+                              ${optionalString (meta.path == "/") ''
+                              cat > tailwind.css <<'EOF'
+                              @import "tailwindcss";
+                              EOF
+
+                              (
+                                cd "$out"
+
+                                tailwindcss \
+                                -i "$NIX_BUILD_TOP/tailwind.css" \
+                                -o "$out/static/styles.css" \
+                                --minify
+                              )
+                              ''}
+
                               runHook postInstall
                           '';
                         };
