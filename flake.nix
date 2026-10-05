@@ -44,19 +44,18 @@
                                 path = "${meta.path}${n}/";
                                 last = meta;
                                 name = n;
-                              } // env;
+                              };
 
                               f = x: make (pages.${x} // { name = x; meta = m x; });
                               g = attrNames pages;
                             in map f g;
 
-                          c = writeText "${name}-context.json" (builtins.toJSON meta);
+                          c = writeText "${name}-context.json" (builtins.toJSON (meta // env));
                         in stdenv.mkDerivation {
                           inherit name;
                           inherit src;
 
                           nativeBuildInputs = [
-                            tailwindcss
                             gomplate
                           ];
 
