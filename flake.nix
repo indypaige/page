@@ -20,6 +20,7 @@
            , page
            , name
            , src
+           , env ? {}
            }:
              let
                toCp = drv: { copy = drv; name = drv.name; };
@@ -34,6 +35,7 @@
                       , name
                       , page
                       , meta
+                      , env ? {}
                       }:
                         let
                           pages'    =
@@ -42,7 +44,7 @@
                                 path = "${meta.path}${n}/";
                                 last = meta;
                                 name = n;
-                              };
+                              } // env;
 
                               f = x: make (pages.${x} // { name = x; meta = m x; });
                               g = attrNames pages;
@@ -101,7 +103,7 @@
                  path = "/";
                };
              in make {
-               inherit static inputs pages page name meta;
+               inherit static inputs pages page name meta env;
              };
     };
 }
