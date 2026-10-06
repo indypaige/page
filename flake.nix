@@ -20,7 +20,7 @@
            , page
            , name
            , src
-           , env ? {}
+           , ctx ? {}
            }:
              let
                toCp = drv: { copy = drv; name = drv.name; };
@@ -50,7 +50,7 @@
                               g = attrNames pages;
                             in map f g;
 
-                          c = writeText "${name}-context.json" (builtins.toJSON (meta // env));
+                          c = writeText "${name}-context.json" (builtins.toJSON (meta // env // ctx));
                         in stdenv.mkDerivation {
                           inherit name;
                           inherit src;
@@ -86,7 +86,7 @@
                  path = "/";
                };
              in make {
-               inherit static inputs pages page name meta env;
+               inherit static inputs pages page name meta;
              };
     };
 }
